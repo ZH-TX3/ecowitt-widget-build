@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- RemoteViews 只支持有限的控件集合：全部用 LinearLayout + TextView + ImageView -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ecowitt_widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@drawable/ecowitt_widget_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/ecowitt_widget_device"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="10sp"
+            android:textColor="#9AA3B2"
+            android:text="Ecowitt" />
+
+        <TextView
+            android:id="@+id/ecowitt_widget_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="9sp"
+            android:textColor="#7C8494" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ecowitt_widget_hero"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="bottom"
+        android:layout_marginTop="2dp">
+
+        <ImageView
+            android:id="@+id/ecowitt_widget_hero_icon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="6dp"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/ecowitt_widget_hero_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textSize="30sp"
+            android:textColor="#FFFFFF"
+            android:text="--" />
+
+        <TextView
+            android:id="@+id/ecowitt_widget_hero_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_marginBottom="6dp"
+            android:textSize="12sp"
+            android:textColor="#9AA3B2" />
+
+        <TextView
+            android:id="@+id/ecowitt_widget_hero_spacer"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/ecowitt_widget_hero_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:textSize="10sp"
+            android:textColor="#9AA3B2" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ecowitt_widget_metrics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="4dp">
+
+        <LinearLayout
+            android:id="@+id/ecowitt_widget_column_0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/ecowitt_widget_row_0_0"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="2dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/ecowitt_widget_icon_0_0"
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:layout_marginEnd="3dp"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_label_0_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="10sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_filler_0_0"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_value_0_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textSize="11sp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_unit_0_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_sub_0_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ecowitt_widget_row_0_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="2dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/ecowitt_widget_icon_0_1"
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:layout_marginEnd="3dp"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_label_0_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="10sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_filler_0_1"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_value_0_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textSize="11sp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_unit_0_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_sub_0_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ecowitt_widget_row_0_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="2dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/ecowitt_widget_icon_0_2"
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:layout_marginEnd="3dp"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_label_0_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="10sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_filler_0_2"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_value_0_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textSize="11sp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_unit_0_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_sub_0_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ecowitt_widget_column_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/ecowitt_widget_row_1_0"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="2dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/ecowitt_widget_icon_1_0"
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:layout_marginEnd="3dp"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_label_1_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="10sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_filler_1_0"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_value_1_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textSize="11sp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_unit_1_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_sub_1_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ecowitt_widget_row_1_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="2dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/ecowitt_widget_icon_1_1"
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:layout_marginEnd="3dp"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_label_1_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="10sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_filler_1_1"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_value_1_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textSize="11sp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_unit_1_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_sub_1_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ecowitt_widget_row_1_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="2dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/ecowitt_widget_icon_1_2"
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:layout_marginEnd="3dp"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_label_1_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="10sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_filler_1_2"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_value_1_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textSize="11sp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_unit_1_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2" />
+
+                <TextView
+                    android:id="@+id/ecowitt_widget_sub_1_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:textSize="9sp"
+                    android:textColor="#9AA3B2"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

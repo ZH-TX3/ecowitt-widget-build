@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  AppWidget 元数据。
+
+  updatePeriodMillis 不能小于 1800000（30 分钟），小于会被系统直接忽略。
+  实际刷新主要靠 App 主动 updateAppWidget，这里的周期只是兜底。
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="110dp"
+    android:minResizeWidth="110dp"
+    android:minResizeHeight="110dp"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/ecowitt_widget"
+    android:previewLayout="@layout/ecowitt_widget"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen" />

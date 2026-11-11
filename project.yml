@@ -1,0 +1,62 @@
+# XcodeGen 工程描述：用来在没有 Xcode 手工操作的情况下产出 EcowittWidget.appex
+#
+# 用途：在任意一台 macOS（云 Mac / CI runner / 同事的机器）上执行
+#     ./scripts/build-appex.sh
+# 就会自动生成 Xcode 工程、无签名编译 widget target、把产物塞进 uts 插件目录并同步版本号。
+#
+# 手工在 Xcode 里建 target 的那套流程（SETUP.md）依然有效，两条路产出同一个 .appex，二选一。
+
+name: EcowittWidgetShell
+
+options:
+  deploymentTarget:
+    iOS: "14.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+# 版本号只写在这里，target 级别不覆盖（对应 SETUP.md 里"写在 Project 级别"那条建议）
+# build-appex.sh 会自动用 manifest.json 的值覆盖
+settings:
+  base:
+    MARKETING_VERSION: "1.1.75"
+    CURRENT_PROJECT_VERSION: "11075"
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "14.0"
+    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGN_IDENTITY: ""
+    DEVELOPMENT_TEAM: ""
+    ENABLE_USER_SCRIPT_SANDBOXING: "NO"
+
+targets:
+  # 壳工程：唯一作用是让 widget extension 有个合法的宿主，产物不参与 uni-app 打包
+  EcowittShell:
+    type: application
+    platform: iOS
+    sources:
+      - path: Shell
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.yourcompany.ecowitt
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
+        INFOPLIST_KEY_CFBundleDisplayName: EcowittShell
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: "YES"
+    dependencies:
+      - target: EcowittWidget
+        embed: true
+
+  # 真正要的东西
+  EcowittWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: EcowittWidget
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ost.testecowittapp.widget
+        INFOPLIST_FILE: EcowittWidget/Info.plist
+        GENERATE_INFOPLIST_FILE: "NO"
+        CODE_SIGN_ENTITLEMENTS: EcowittWidget/EcowittWidget.entitlements
+        SKIP_INSTALL: "YES"
+        APPLICATION_EXTENSION_API_ONLY: "YES"

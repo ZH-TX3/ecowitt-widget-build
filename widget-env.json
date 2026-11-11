@@ -1,0 +1,14 @@
+{
+	"prod": {
+		"bundleId": "com.ost.ecowitt",
+		"extensionId": "com.ost.ecowitt.widget",
+		"appGroup": "group.com.ost.ecowitt",
+		"extensionProfile": "ios-EcowittWidget-prod.mobileprovision"
+	},
+	"test": {
+		"bundleId": "com.ost.testecowittapp",
+		"extensionId": "com.ost.testecowittapp.widget",
+		"appGroup": "group.com.ost.ecowitt",
+		"extensionProfile": "ios-EcowittWidgetTest-dev.mobileprovision"
+	}
+}

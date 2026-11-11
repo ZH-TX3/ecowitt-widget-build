@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  uts 插件 app-android 的清单，打包时会合并进宿主 App。
+
+  注意：
+  1. receiver 的 android:name 必须是全限定类名，与 hybrid.kt 的 package
+     （uni.modules.ecowittwidget）保持一致。
+  2. exported 必须是 false：APPWIDGET_UPDATE 由系统进程派发，非导出也能收到；
+     设 true 会让任意应用向本组件发广播，属于不必要的攻击面。
+     如果某些 ROM 上小组件不刷新，先把这里改成 true 验证一次，再决定是否保留。
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+
+        <receiver
+            android:name="uni.modules.ecowittwidget.EcowittWidgetProvider"
+            android:exported="false"
+            android:label="Ecowitt">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/ecowitt_widget_info" />
+        </receiver>
+
+    </application>
+
+</manifest>

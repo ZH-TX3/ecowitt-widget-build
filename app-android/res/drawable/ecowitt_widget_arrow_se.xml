@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 风向箭头：0 度指北，每 45 度一档 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <group
+        android:rotation="135"
+        android:pivotX="12"
+        android:pivotY="12">
+        <path
+            android:fillColor="#FF4B9BFF"
+            android:pathData="M4,12l1.41,1.41L11,7.83V20h2V7.83l5.58,5.59L20,12l-8,-8 -8,8z" />
+    </group>
+</vector>
