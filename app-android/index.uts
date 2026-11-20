@@ -1,0 +1,43 @@
+import { PushWidgetData, ReloadWidget, ReadWidgetData, WidgetSyncResult } from '../interface.uts'
+
+/**
+ * Android 端实现
+ *
+ * 与 iOS 的差异（有意为之，不是偷懒）：
+ *  - appGroup 参数在 Android 侧没有意义：RemoteViews 与 App 同进程，直接读 SharedPreferences，
+ *    但为了签名一致仍然接收该参数
+ *  - 没有刷新预算，刷新由 App 主动调 updateAppWidget 触发
+ *  - 具体渲染在 hybrid.kt 的 EcowittWidgetRenderer 里，这里只做桥接
+ */
+
+const DEFAULT_WIDGET_KIND = 'EcowittWidget'
+
+export const pushWidgetData : PushWidgetData = function (json : string, appGroup : string, widgetKind : string) : WidgetSyncResult {
+	const kind = (widgetKind == null || widgetKind.length === 0) ? DEFAULT_WIDGET_KIND : widgetKind
+	if (json == null || json.length === 0) {
+		return { success: false, message: 'payload is empty' } as WidgetSyncResult
+	}
+
+	const context = UTSAndroid.getAppContext()
+	const error = EcowittWidgetBridge.savePayloadJson(context, json, kind)
+	if (error == null || error.length === 0) {
+		return { success: true, message: 'ok' } as WidgetSyncResult
+	}
+	return { success: false, message: error } as WidgetSyncResult
+}
+
+export const reloadWidget : ReloadWidget = function (widgetKind : string) : WidgetSyncResult {
+	const kind = (widgetKind == null || widgetKind.length === 0) ? DEFAULT_WIDGET_KIND : widgetKind
+	const context = UTSAndroid.getAppContext()
+	const error = EcowittWidgetBridge.reloadWidget(context, kind)
+	if (error == null || error.length === 0) {
+		return { success: true, message: 'ok' } as WidgetSyncResult
+	}
+	return { success: false, message: error } as WidgetSyncResult
+}
+
+export const readWidgetData : ReadWidgetData = function (appGroup : string) : string {
+	const context = UTSAndroid.getAppContext()
+	const json = EcowittWidgetBridge.readPayloadJson(context)
+	return json == null ? '' : json
+}

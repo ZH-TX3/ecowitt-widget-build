@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  uts 插件 app-android 的清单，打包时会合并进宿主 App。
+
+  注意：
+  1. receiver 的 android:name 必须是全限定类名，与 hybrid.kt 的 package
+     （uts.sdk.modules.ecowittWidget）保持一致。
+  2. exported 必须是 false：APPWIDGET_UPDATE 由系统进程派发，非导出也能收到；
+     设 true 会让任意应用向本组件发广播，属于不必要的攻击面。
+     如果某些 ROM 上小组件不刷新，先把这里改成 true 验证一次，再决定是否保留。
+  3. package 必须有：HBuilderX 本地构建会把这个清单当独立库模块做 aapt2 link，
+     缺 package 会直接报 `<manifest> must have a 'package' attribute`。
+     值必须与 hybrid.kt 的 package 一致（uts.sdk.modules.<camelize(插件id)>）。
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="uts.sdk.modules.ecowittWidget">
+
+    <!-- 开机后主动刷一次：否则 updatePeriodMillis 不会立刻触发，卡片会停在旧值 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application>
+
+        <receiver
+            android:name="uts.sdk.modules.ecowittWidget.EcowittWidgetProvider"
+            android:exported="false"
+            android:label="Ecowitt">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <!-- 点击组件上的刷新图标：原地刷新，不进 App -->
+                <action android:name="uts.sdk.modules.ecowittWidget.ACTION_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/ecowitt_widget_info" />
+        </receiver>
+
+        <!-- 开机 / App 升级后刷新已有组件 -->
+        <receiver
+            android:name="uts.sdk.modules.ecowittWidget.EcowittBootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

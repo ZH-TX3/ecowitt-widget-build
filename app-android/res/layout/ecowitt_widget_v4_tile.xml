@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  小组件 v4 · large 的瓦片模板（2 列或 3 列里的一格）
+
+  这个布局不直接出现在 AppWidgetProviderInfo 里，而是由渲染器
+  `RemoteViews.addView(slotId, tileViews)` 塞进 large 的格子容器。
+  所以根节点是 match_parent 宽、wrap_content 高：宽度由外层格子的 weight 决定，高度由内容决定。
+
+  结构对应 DESIGN-SPEC-v4 第 3 节「large · 瓦片」：
+    head   模块名（accent 色）+ 右侧状态/签名
+    value  数值 + 单位 + 同行短摘要（格子太矮时不显示摘要）
+    rows   明细行（同模块其它维度优先），显示几行由 plan.tileRows 决定
+
+  为什么用 addView 而不是写死 N 个格子：
+    模块数由设备和用户配置决定（2~11 个），写死多少都会有一边浪费或不够。
+    RemoteViews 支持 addView 到 LinearLayout，这是唯一能按需铺格子的办法。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w4_tile_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:padding="8dp"
+    android:baselineAligned="false"
+    android:background="@drawable/ecowitt_widget_well_dark">
+
+    <!-- head：模块名 + 状态/签名 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="26dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+
+        <TextView
+            android:id="@+id/w4_tile_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textSize="10dp"
+            android:textColor="#38BDF8" />
+
+        <!-- 视觉件分成三个槽位，各自按自身比例显示。
+             之前共用一张 14×14 的 fitXY 图，半圆刻度（30×16）和电池（35×14）
+             被硬拉成正方形，看起来就是"挤压"。wrap_content + fitCenter 就不会变形。 -->
+        <ImageView
+            android:id="@+id/w4_tile_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:contentDescription="@null" />
+
+        <ImageView
+            android:id="@+id/w4_tile_icon_dial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:contentDescription="@null" />
+
+        <ImageView
+            android:id="@+id/w4_tile_icon_wide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/w4_tile_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textStyle="bold"
+            android:textColor="#38BDF8" />
+    </LinearLayout>
+
+    <!-- 数值行 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:orientation="horizontal"
+        android:gravity="bottom"
+        android:baselineAligned="false">
+
+        <TextView
+            android:id="@+id/w4_tile_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:textColor="#F1F5F9" />
+
+        <TextView
+            android:id="@+id/w4_tile_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+
+        <TextView
+            android:id="@+id/w4_tile_detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+    </LinearLayout>
+
+    <!-- 明细行：最多 4 行，多余由渲染器 GONE 掉 -->
+    <LinearLayout
+        android:id="@+id/w4_tile_row1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <TextView
+            android:id="@+id/w4_tile_row1_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+
+        <TextView
+            android:id="@+id/w4_tile_row1_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textStyle="bold"
+            android:textColor="#F1F5F9" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/w4_tile_row2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <TextView
+            android:id="@+id/w4_tile_row2_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+
+        <TextView
+            android:id="@+id/w4_tile_row2_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textStyle="bold"
+            android:textColor="#F1F5F9" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/w4_tile_row3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <TextView
+            android:id="@+id/w4_tile_row3_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+
+        <TextView
+            android:id="@+id/w4_tile_row3_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textStyle="bold"
+            android:textColor="#F1F5F9" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/w4_tile_row4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <TextView
+            android:id="@+id/w4_tile_row4_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+
+        <TextView
+            android:id="@+id/w4_tile_row4_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textStyle="bold"
+            android:textColor="#F1F5F9" />
+    </LinearLayout>
+</LinearLayout>

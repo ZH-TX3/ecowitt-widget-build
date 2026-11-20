@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  小组件 v4 · large（hero + 瓦片网格）
+
+  结构对应 DESIGN-SPEC-v4 第 3 节：
+    station  ecowitt + 站名 + 更新时间
+    zones
+      hero   第一个模块（按 medium 的结构画：头 + 数值/明细 + 曲线）
+      rows   瓦片网格：最多 5 行 × 3 列，每格是一个空容器，
+             渲染器用 RemoteViews.addView 把 ecowitt_widget_v4_tile 塞进去。
+
+  **尺寸适配沿用 v3 的经验**：
+    1. 所有 id 前缀 w4_；well 的圆角底走 setBackgroundResource（int 入参，RemoteViews 反射能调）；
+    2. 高度**全部 wrap_content**，不写死 dp —— 实测安卓整站盒子只有 376×202dp，
+       比设计稿的 364×382 矮一半，写死高度必然裁字；
+       所以「能放几个格子、每格几行明细」由渲染器按实测尺寸算（planFor）。
+    3. 列数靠显隐切换：每行预置 3 个等宽格子（weight 1），
+       2 列模式把每行第 3 个格子 GONE 掉，剩下两个各占一半 —— 不需要改 weight。
+    4. 格子太多放不下时，渲染器把多余的行和格子 GONE 掉，绝不裁切。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w4_large_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:baselineAligned="false"
+    android:background="@drawable/ecowitt_widget_bg_dark">
+
+    <!-- ============ station ============ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+
+        <TextView
+            android:id="@+id/w4_large_brand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            android:textColor="#F1F5F9"
+            android:text="ecowitt" />
+
+        <TextView
+            android:id="@+id/w4_large_station"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textSize="10dp"
+            android:textColor="#F1F5F9" />
+
+        <TextView
+            android:id="@+id/w4_large_meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+    </LinearLayout>
+
+    <!-- ============ zones ============ -->
+    <LinearLayout
+        android:id="@+id/w4_large_zones"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="6dp"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+
+        <!-- ===== hero：第一个模块 ===== -->
+        <LinearLayout
+            android:id="@+id/w4_large_hero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:baselineAligned="false"
+            android:background="@drawable/ecowitt_widget_well_dark">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:baselineAligned="false">
+
+                <ImageView
+                    android:id="@+id/w4_large_hero_chip"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="4dp"
+                    android:scaleType="fitXY"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/w4_large_hero_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:textSize="10dp"
+                    android:textStyle="bold"
+                    android:textColor="#F1F5F9" />
+
+                <ImageView
+                    android:id="@+id/w4_large_hero_state_icon"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginStart="2dp"
+                    android:scaleType="fitXY"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/w4_large_hero_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="8dp"
+                    android:textStyle="bold"
+                    android:textColor="#38BDF8" />
+
+                <TextView
+                    android:id="@+id/w4_large_hero_spacer"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/w4_large_hero_meta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="8dp"
+                    android:textColor="#A3B1C3" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <!-- 左栏：数值 + 变化量/极值 + 明细行 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="38"
+                    android:orientation="vertical"
+                    android:baselineAligned="false">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="bottom"
+                        android:baselineAligned="false">
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:includeFontPadding="false"
+                            android:textSize="22dp"
+                            android:textStyle="bold"
+                            android:textColor="#F1F5F9" />
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_unit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:maxLines="1"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textColor="#A3B1C3" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/w4_large_hero_meta_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:baselineAligned="false">
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_delta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textColor="#ED7839" />
+
+                        <ImageView
+                            android:id="@+id/w4_large_hero_peak_max_ico"
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:layout_marginStart="6dp"
+                            android:scaleType="fitXY"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_peak_max"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:maxLines="1"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textColor="#ED7839" />
+
+                        <ImageView
+                            android:id="@+id/w4_large_hero_peak_min_ico"
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:layout_marginStart="6dp"
+                            android:scaleType="fitXY"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_peak_min"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:maxLines="1"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textColor="#09A8E6" />
+                    </LinearLayout>
+
+                    <!-- hero 明细行：最多 3 行 -->
+                    <LinearLayout
+                        android:id="@+id/w4_large_hero_row1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_row1_label"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textColor="#A3B1C3" />
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_row1_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textStyle="bold"
+                            android:textColor="#F1F5F9" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/w4_large_hero_row2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_row2_label"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textColor="#A3B1C3" />
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_row2_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textStyle="bold"
+                            android:textColor="#F1F5F9" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/w4_large_hero_row3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_row3_label"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textColor="#A3B1C3" />
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_row3_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textStyle="bold"
+                            android:textColor="#F1F5F9" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- 右栏：曲线 + 时间轴（与 medium 同一套三段刻度） -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="62"
+                    android:layout_marginStart="8dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false">
+
+                    <ImageView
+                        android:id="@+id/w4_large_hero_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:scaleType="fitXY"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:id="@+id/w4_large_hero_axis"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_axis_left"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:maxLines="1"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textColor="#A3B1C3" />
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_axis_mid"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textColor="#A3B1C3" />
+
+                        <TextView
+                            android:id="@+id/w4_large_hero_axis_right"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="end"
+                            android:maxLines="1"
+                            android:includeFontPadding="false"
+                            android:textSize="8dp"
+                            android:textColor="#A3B1C3" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ===== 瓦片网格：5 行 × 3 列，每格是空容器 ===== -->
+        <LinearLayout
+            android:id="@+id/w4_large_rows"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="vertical"
+            android:baselineAligned="false">
+
+            <LinearLayout
+                android:id="@+id/w4_large_row1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:id="@+id/w4_large_r1c1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="0dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+                <LinearLayout
+                    android:id="@+id/w4_large_r1c2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+                <LinearLayout
+                    android:id="@+id/w4_large_r1c3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/w4_large_row2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:id="@+id/w4_large_r2c1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="0dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+                <LinearLayout
+                    android:id="@+id/w4_large_r2c2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+                <LinearLayout
+                    android:id="@+id/w4_large_r2c3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/w4_large_row3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:id="@+id/w4_large_r3c1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="0dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+                <LinearLayout
+                    android:id="@+id/w4_large_r3c2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+                <LinearLayout
+                    android:id="@+id/w4_large_r3c3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/w4_large_row4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:id="@+id/w4_large_r4c1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="0dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+                <LinearLayout
+                    android:id="@+id/w4_large_r4c2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+                <LinearLayout
+                    android:id="@+id/w4_large_r4c3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/w4_large_row5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:id="@+id/w4_large_r5c1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="0dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+                <LinearLayout
+                    android:id="@+id/w4_large_r5c2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+                <LinearLayout
+                    android:id="@+id/w4_large_r5c3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:baselineAligned="false" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

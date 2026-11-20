@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  小组件 v4 · medium（同一条读数 + 最近 24 小时的曲线）
+
+  结构对应 DESIGN-SPEC-v4 第 3 节：
+    head  chip + 模块名 + 时间
+    body  左 34%：数值 + 单位 / 变化量·极值 / 附带项
+          右 66%：曲线 + 三段时间轴
+    foot  成对摘要（左） + Last 24h（右）
+
+  **尺寸适配沿用 v3 的经验**：
+    扁平盒子（实测 313×67dp）靠两件事活下来 —— 左栏只留 value / meta / attach
+    三行，且趋势图用 layout_weight=1 吃掉剩余高度，盒子扁它就自动变矮。
+    另外 medium 没有范围切换：v4 固定 24 小时，右栏不再有 range-tabs 那一行。
+
+  RemoteViews 只认白名单控件；曲线由 provider 进程画成 Bitmap 塞进 ImageView。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w4_medium_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:baselineAligned="false"
+    android:background="@drawable/ecowitt_widget_bg_dark">
+
+    <!-- ============ head ============ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+
+        <ImageView
+            android:id="@+id/w4_medium_chip"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="4dp"
+            android:scaleType="fitXY"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/w4_medium_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textSize="10dp"
+            android:textStyle="bold"
+            android:textColor="#F1F5F9" />
+
+        <TextView
+            android:id="@+id/w4_medium_spacer"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/w4_medium_meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+    </LinearLayout>
+
+    <!-- ============ body：左 34% / 右 66% ============ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="2dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+
+        <!-- 左栏：数值 + 变化量/极值（这块垂直居中）… 附带项（压列底）
+             结构与 small 的 main / foot 一致，只是左右排布换成上下 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="42"
+            android:orientation="vertical"
+            android:baselineAligned="false">
+
+            <LinearLayout
+                android:id="@+id/w4_medium_current"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:baselineAligned="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="bottom"
+                android:baselineAligned="false">
+
+                <TextView
+                    android:id="@+id/w4_medium_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="32dp"
+                    android:textStyle="bold"
+                    android:textColor="#F1F5F9" />
+
+                <TextView
+                    android:id="@+id/w4_medium_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="10dp"
+                    android:textColor="#A3B1C3" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/w4_medium_meta_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:baselineAligned="false">
+
+                <TextView
+                    android:id="@+id/w4_medium_delta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="8dp"
+                    android:textColor="#ED7839" />
+
+                <ImageView
+                    android:id="@+id/w4_medium_peak_max_ico"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginStart="6dp"
+                    android:scaleType="fitXY"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/w4_medium_peak_max"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="8dp"
+                    android:textColor="#ED7839" />
+
+                <ImageView
+                    android:id="@+id/w4_medium_peak_min_ico"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginStart="6dp"
+                    android:scaleType="fitXY"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/w4_medium_peak_min"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="8dp"
+                    android:textColor="#09A8E6" />
+            </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/w4_medium_attach"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:textSize="8dp"
+                android:textColor="#A3B1C3" />
+        </LinearLayout>
+
+        <!-- 右栏：曲线 + 时间轴 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="58"
+            android:layout_marginStart="8dp"
+            android:orientation="vertical"
+            android:baselineAligned="false">
+
+            <ImageView
+                android:id="@+id/w4_medium_chart"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:scaleType="fitXY"
+                android:contentDescription="@null" />
+
+            <!-- 空态：没有历史数据时替换曲线（两块同时只显示一个） -->
+            <TextView
+                android:id="@+id/w4_medium_empty"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:maxLines="2"
+                android:textSize="8dp"
+                android:textColor="#A3B1C3"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/w4_medium_axis_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <TextView
+                    android:id="@+id/w4_medium_axis_left"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="8dp"
+                    android:textColor="#A3B1C3" />
+
+                <TextView
+                    android:id="@+id/w4_medium_axis_mid"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="8dp"
+                    android:textColor="#A3B1C3" />
+
+                <TextView
+                    android:id="@+id/w4_medium_axis_right"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="8dp"
+                    android:textColor="#A3B1C3" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ============ foot ============ -->
+    <LinearLayout
+        android:id="@+id/w4_medium_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+
+        <TextView
+            android:id="@+id/w4_medium_foot_left"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+
+        <TextView
+            android:id="@+id/w4_medium_foot_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+    </LinearLayout>
+</LinearLayout>
