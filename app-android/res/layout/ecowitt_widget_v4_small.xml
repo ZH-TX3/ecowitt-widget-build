@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  小组件 v4 · small（一条突出读数 + 一个附带项）
+
+  结构对应 DESIGN-SPEC-v4 第 3 节：
+    head  chip + 模块名 + 时间
+    main  左：数值 + 单位、变化量/极值行   右：状态文案 或 视觉签名
+    foot  附带项（或成对摘要）…… 状态
+
+  **尺寸适配沿用 v3 的经验**（这些都是实机量出来的，别改）：
+    1. 三块高度用 layout_weight 分（22 / 88 + 内容自适应），扁盒子自动把空间给中间；
+    2. 字号不写死在实际值上，渲染时按 textScale 统一乘（setTextViewTextSize + DIP）；
+    3. 盒子太矮时由 applyContentBudget 把 foot 整块 GONE，宁可少信息也不压字；
+    4. 所有 id 前缀 w4_，插件打进宿主包后 R.id 是全局命名空间，和 v3 的 w3_ 分开。
+
+  RemoteViews 只认白名单控件：全部是 LinearLayout / TextView / ImageView。
+  撑开用的占位也必须用 TextView —— 裸 <View> 会让桌面端 inflate 抛异常。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w4_small_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:baselineAligned="false"
+    android:background="@drawable/ecowitt_widget_bg_dark">
+
+    <!-- ============ head：chip + 模块名 + 时间 ============ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="22"
+        android:minHeight="22dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+
+        <ImageView
+            android:id="@+id/w4_small_chip"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:scaleType="fitXY"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/w4_small_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textSize="10dp"
+            android:textStyle="bold"
+            android:textColor="#F1F5F9" />
+
+        <TextView
+            android:id="@+id/w4_small_spacer"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/w4_small_meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+    </LinearLayout>
+
+    <!-- ============ main：数值（左） + 状态/签名（右） ============ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="88"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:baselineAligned="false">
+
+            <!-- 数值行：数值 + 单位 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="bottom"
+                android:baselineAligned="false">
+
+                <TextView
+                    android:id="@+id/w4_small_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="34dp"
+                    android:textStyle="bold"
+                    android:textColor="#F1F5F9" />
+
+                <TextView
+                    android:id="@+id/w4_small_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="10dp"
+                    android:textColor="#A3B1C3" />
+            </LinearLayout>
+
+            <!-- 变化量 + 极值同一行，极值不重复印单位 -->
+            <LinearLayout
+                android:id="@+id/w4_small_meta_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:baselineAligned="false">
+
+                <TextView
+                    android:id="@+id/w4_small_delta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="8dp"
+                    android:textColor="#ED7839" />
+
+                <ImageView
+                    android:id="@+id/w4_small_peak_max_ico"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginStart="8dp"
+                    android:scaleType="fitXY"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/w4_small_peak_max"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="8dp"
+                    android:textColor="#ED7839" />
+
+                <ImageView
+                    android:id="@+id/w4_small_peak_min_ico"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginStart="8dp"
+                    android:scaleType="fitXY"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/w4_small_peak_min"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:maxLines="1"
+                    android:includeFontPadding="false"
+                    android:textSize="8dp"
+                    android:textColor="#09A8E6" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 右侧槽位：状态文案（颜色跟模块 accent）或视觉签名，二选一 -->
+        <TextView
+            android:id="@+id/w4_small_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:maxLines="1"
+            android:includeFontPadding="false"
+            android:textSize="10dp"
+            android:textStyle="bold"
+            android:textColor="#38BDF8" />
+
+        <ImageView
+            android:id="@+id/w4_small_visual"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="4dp"
+            android:scaleType="fitXY"
+            android:contentDescription="@null" />
+    </LinearLayout>
+
+    <!-- ============ foot：只有附带项（设计稿这里右边是空的） ============ -->
+    <LinearLayout
+        android:id="@+id/w4_small_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+
+        <TextView
+            android:id="@+id/w4_small_attach"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textSize="8dp"
+            android:textColor="#A3B1C3" />
+
+    </LinearLayout>
+</LinearLayout>

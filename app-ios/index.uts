@@ -1,0 +1,75 @@
+import { PushWidgetData, ReloadWidget, ReadWidgetData, TakePendingNav, WidgetSyncResult, HasWidgets } from '../interface.uts'
+
+/**
+ * 默认值：必须与下面三处完全一致
+ * 1. nativeResources/ios/UniApp.entitlements
+ * 2. nativeResources/ios/ios-extension.json -> entitlements
+ * 3. native/ios-widget/EcowittWidget/EcowittWidgetBridgeData.swift 里的 kAppGroup
+ */
+const DEFAULT_APP_GROUP = 'group.com.ost.ecowitt'
+const DEFAULT_WIDGET_KIND = 'EcowittWidget'
+
+export const pushWidgetData : PushWidgetData = function (json : string, appGroup : string, widgetKind : string) : WidgetSyncResult {
+	// 顺手刷一次「桌面上有没有组件」的缓存：写盘都发生在 App 前台，代价可忽略
+	WidgetDataBridge.refreshWidgetPresence(appGroup.length == 0 ? DEFAULT_APP_GROUP : appGroup)
+	const group = (appGroup == null || appGroup.length == 0) ? DEFAULT_APP_GROUP : appGroup
+	const kind = (widgetKind == null || widgetKind.length == 0) ? DEFAULT_WIDGET_KIND : widgetKind
+
+	if (json == null || json.length == 0) {
+		return { success: false, message: 'payload is empty' } as WidgetSyncResult
+	}
+
+	const ok = WidgetDataBridge.savePayloadJson(json, group, kind)
+	if (!ok) {
+		return { success: false, message: 'app group unavailable: ' + group } as WidgetSyncResult
+	}
+	return { success: true, message: 'ok' } as WidgetSyncResult
+}
+
+export const reloadWidget : ReloadWidget = function (widgetKind : string) : WidgetSyncResult {
+	const kind = (widgetKind == null || widgetKind.length == 0) ? DEFAULT_WIDGET_KIND : widgetKind
+	WidgetDataBridge.reloadTimelines(kind)
+	return { success: true, message: 'ok' } as WidgetSyncResult
+}
+
+export const readWidgetData : ReadWidgetData = function (appGroup : string) : string {
+	const group = (appGroup == null || appGroup.length == 0) ? DEFAULT_APP_GROUP : appGroup
+	return WidgetDataBridge.readPayloadJson(group)
+}
+
+/**
+ * 读取并清空「小组件点击要跳转的页面」。
+ * appex 的 AppIntent 会往 App Group 写 pendingNav，这里读一次就清掉，避免重复跳转。
+ */
+export const takePendingNav : TakePendingNav = function (appGroup : string) : string {
+	const group = (appGroup == null || appGroup.length == 0) ? DEFAULT_APP_GROUP : appGroup
+	return WidgetDataBridge.takePendingNav(group)
+}
+
+/**
+ * iOS 生命周期钩子：捕获 URL Scheme 唤起，把 URL 原样写进 App Group。
+ *
+ * 为什么必须自己抓：DCloud 运行时在 iOS 上把 plus.runtime.arguments 换成了空推送对象
+ * （冷启动 launcher 仍是 default、getLaunchOptionsSync 只给首页），scheme 参数拿不到。
+ * 官方问答 ask.dcloud.net.cn/question/216032 在 4.66 上同样复现，属于运行时行为，
+ * 这里用 UTSiOSHookProxy 的 openURL 回调绕开它。
+ *
+ * 注意：class 必须 export，否则不会参与注册。
+ */
+export class EcowittUrlSchemeHook implements UTSiOSHookProxy {
+	onCreate() {}
+
+	applicationOpenURLOptions(app: UIApplication | null, url: URL, options: Map<UIApplication.OpenURLOptionsKey, any> | null = null): boolean {
+		const s = url.absoluteString
+		if (s.length > 0 && s.includes('ecowitt://')) {
+			WidgetDataBridge.capturePendingNavUrl(s, DEFAULT_APP_GROUP)
+		}
+		// 返回 false：不抢占系统的默认处理
+		return false
+	}
+}
+
+/** 桌面上有没有这个组件（读上一次 getCurrentConfigurations 的缓存，查不到当有） */
+export const hasWidgets : HasWidgets = function () : boolean {
+	return WidgetDataBridge.hasWidgets(DEFAULT_APP_GROUP)
+}

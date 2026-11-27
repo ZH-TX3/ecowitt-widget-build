@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  AppWidget 元数据。
+
+  尺寸策略（与 iOS 不同，别照搬）：
+    iOS 的尺寸由系统规定 3 档，开发者只能选；安卓的尺寸由 launcher 的网格决定，
+    同一条 minWidth 在不同机器上落到的实际 dp 都不一样。
+    所以这里声明「默认占几个格子」，再用 min/max resize 把用户的拉扯范围夹住，
+    保证不会出现 110×300 这种畸形比例（那正是 small 显示成非正方形的原因）。
+
+    targetCellWidth/Height 是 API 31+ 的属性，存在时优先于 minWidth/minHeight；
+    低版本系统读不到就退回 minWidth/minHeight（官方公式 70×n−30）。
+
+    updatePeriodMillis 不能小于 1800000（30 分钟），小于会被系统直接忽略。
+    实际刷新主要靠 App 主动 updateAppWidget，这里的周期只是兜底。
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="110dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="2"
+    android:minResizeWidth="110dp"
+    android:minResizeHeight="110dp"
+    android:maxResizeWidth="250dp"
+    android:maxResizeHeight="250dp"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/ecowitt_widget_v4_medium"
+    android:previewLayout="@layout/ecowitt_widget_v4_medium"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen" />

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v3 时间范围选中态药丸：深色。对应 HTML 的 .range-tabs button / radius 6px -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#202A37" />
+    <corners android:radius="6dp" />
+</shape>

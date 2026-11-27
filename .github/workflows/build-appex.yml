@@ -1,0 +1,116 @@
+# 自包含的 widget 构建 workflow：不依赖 uni-app 仓库的其它文件。
+# 由 script/build_appex_ci.py 自动同步到 GitHub 上的私有镜像仓库并触发。
+#
+# 手动跑也可以：
+#   gh workflow run build-appex.yml -f env=test -f version=1.1.75 -f build=11075
+
+name: Build widget appex
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: "环境（对应 widget-env.json 的 key）"
+        required: true
+        default: test
+        type: choice
+        options: [test, prod]
+      version:
+        description: "CFBundleShortVersionString，与主 App 一致"
+        required: true
+        default: "0.0.0"
+      build:
+        description: "CFBundleVersion，与主 App 一致"
+        required: true
+        default: "0"
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 20
+    env:
+      APPEX_NAME: EcowittWidget.appex
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve environment
+        id: env
+        run: |
+          set -euo pipefail
+          ENV_NAME="${{ github.event.inputs.env || 'test' }}"
+          VERSION="${{ github.event.inputs.version || '0.0.0' }}"
+          BUILD="${{ github.event.inputs.build || '0' }}"
+          python3 - "$ENV_NAME" <<'PY' >> "$GITHUB_OUTPUT"
+          import json, sys, pathlib
+          env = sys.argv[1]
+          e = json.loads(pathlib.Path("widget-env.json").read_text(encoding="utf-8"))[env]
+          print(f"bundle_id={e['bundleId']}")
+          print(f"extension_id={e['extensionId']}")
+          print(f"app_group={e['appGroup']}")
+          PY
+          {
+            echo "env_name=$ENV_NAME"
+            echo "version=$VERSION"
+            echo "build=$BUILD"
+          } >> "$GITHUB_OUTPUT"
+          echo "env=$ENV_NAME version=$VERSION($BUILD)"
+
+      - name: Xcode version
+        run: xcodebuild -version
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate --spec project.yml --quiet
+
+      - name: Build appex (unsigned)
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project EcowittWidgetShell.xcodeproj \
+            -target EcowittWidget \
+            -configuration Release \
+            -sdk iphoneos \
+            SYMROOT="$PWD/build" \
+            ONLY_ACTIVE_ARCH=NO \
+            PRODUCT_BUNDLE_IDENTIFIER="${{ steps.env.outputs.extension_id }}" \
+            MARKETING_VERSION="${{ steps.env.outputs.version }}" \
+            CURRENT_PROJECT_VERSION="${{ steps.env.outputs.build }}" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            build
+
+      - name: Inject App Group + verify
+        run: |
+          set -euo pipefail
+          APPEX="build/Release-iphoneos/$APPEX_NAME"
+          test -d "$APPEX"
+          /usr/libexec/PlistBuddy -c "Delete :EcowittAppGroup" "$APPEX/Info.plist" >/dev/null 2>&1 || true
+          /usr/libexec/PlistBuddy -c "Add :EcowittAppGroup string ${{ steps.env.outputs.app_group }}" "$APPEX/Info.plist"
+
+          plutil -lint "$APPEX/Info.plist"
+          test "$(plutil -extract CFBundleIdentifier raw "$APPEX/Info.plist")" = "${{ steps.env.outputs.extension_id }}"
+          test "$(plutil -extract CFBundleShortVersionString raw "$APPEX/Info.plist")" = "${{ steps.env.outputs.version }}"
+          test "$(plutil -extract CFBundleVersion raw "$APPEX/Info.plist")" = "${{ steps.env.outputs.build }}"
+          test "$(plutil -extract EcowittAppGroup raw "$APPEX/Info.plist")" = "${{ steps.env.outputs.app_group }}"
+          test "$(plutil -extract NSExtension.NSExtensionPointIdentifier raw "$APPEX/Info.plist")" = "com.apple.widgetkit-extension"
+          file "$APPEX/EcowittWidget" | grep -q "Mach-O"
+          echo "appex ok: $(plutil -extract CFBundleIdentifier raw "$APPEX/Info.plist")"
+
+      # 先把 .appex 拷进一个干净目录再上传：
+      # upload-artifact 会以给定 path 为根摊平，直接传 .appex 目录会丢掉目录名，
+      # 导致 gh run download -D Plugins 落成两个散文件。
+      - name: Stage artifact
+        run: |
+          set -euo pipefail
+          mkdir -p artifact
+          cp -R "build/Release-iphoneos/$APPEX_NAME" artifact/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EcowittWidget-dir
+          path: artifact
+          if-no-files-found: error
